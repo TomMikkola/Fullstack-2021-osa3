@@ -7,107 +7,108 @@ const Person = require('./models/person')
 const app = express()
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
 
 app.use( express.static('build') )
 app.use( express.json() )
 app.use( cors() )
-morgan.token('body', (req, res) => JSON.stringify(req.body) )
+morgan.token('body', (req) => JSON.stringify(req.body) )
 app.use( morgan(':method :url :status :res[content-length] - :response-time ms :body') )
 
 app.get('/api/persons', (request, response) => {
-    Person.find({})
-        .then( persons => {
-            response.json(persons)
-        })
-        .catch( error => next(error) )
+  Person.find({})
+    .then( persons => {
+      response.json(persons)
+    })
+    // eslint-disable-next-line no-undef
+    .catch( error => next(error) )
 })
 
 app.get('/api/info', (request, response) => {
-    Person.count({}).then( count => {
-        const numberOfPersons = count
-        const timeOfRequest = new Date() 
+  Person.count({}).then( count => {
+    const numberOfPersons = count
+    const timeOfRequest = new Date()
 
     response.send(
-        `<div>Phonebook has info for ${numberOfPersons} people</div>
+      `<div>Phonebook has info for ${numberOfPersons} people</div>
         <br />
         <div>${timeOfRequest}</diV>`)
-    } )
+  } )
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-    const id = request.params.id
+  const id = request.params.id
 
-    Person.findById(id)
-        .then( result => {
-            if(result){
-                response.json(result)
-            } else {
-                response.status(404).end()
-            }
-        })
-        .catch( error => next(error)) 
+  Person.findById(id)
+    .then( result => {
+      if(result){
+        response.json(result)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch( error => next(error))
 })
 
 app.post('/api/persons/', (request, response, next) => {
-    const body = request.body
+  const body = request.body
 
-    const person = new Person({
-        name: body.name,
-        number: body.number,
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+
+  person
+    .save()
+    .then( savedPerson => {
+      console.log('person saved')
+      response.json( savedPerson.toJSON() )
     })
-
-    person
-        .save()
-        .then( savedPerson => {
-            console.log("person saved")
-            response.json( savedPerson.toJSON() )
-        })
-        .catch( error => next(error) )
+    .catch( error => next(error) )
 })
 
 app.put( '/api/persons/:id', (request, response, next) => {
-    const body = request.body
+  const body = request.body
 
-    const person = {
-        name: body.name,
-        number: body.number
-    }
-    
-    Person.findByIdAndUpdate( request.params.id, person, { new: true } )
-        .then( updatedPerson => {
-            response.json(updatedPerson)
-        })
-        .catch( error => next(error) )
+  const person = {
+    name: body.name,
+    number: body.number
+  }
+
+  Person.findByIdAndUpdate( request.params.id, person, { new: true } )
+    .then( updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch( error => next(error) )
 } )
 
 app.delete('/api/persons/:id', (request, response, next) => {
 
-    Person.findByIdAndRemove( request.params.id )
-        .then( result => {
-            console.log("Removed person with id: ", request.params.id)
-            response.status(204).end()
-        })
-        .catch( error => next(error) )
+  Person.findByIdAndRemove( request.params.id )
+    .then( () => {
+      console.log('Removed person with id: ', request.params.id)
+      response.status(204).end()
+    })
+    .catch( error => next(error) )
 })
 
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: 'unknown endpoint' })
+  response.status(404).send({ error: 'unknown endpoint' })
 }
 app.use( unknownEndpoint )
 
 const errorHandler = (error, request, response, next) => {
-    console.log( error.message )
+  console.log( error.message )
 
-    if( error.name === 'CastError'){
-        return response.status(400).send({ error: 'malformatted id' })
-    }
+  if( error.name === 'CastError'){
+    return response.status(400).send({ error: 'malformatted id' })
+  }
 
-    if( error.name === 'ValidationError' ){
-        return response.status(400).json({ error: error.message })
-    }
-    
-    next(error)
+  if( error.name === 'ValidationError' ){
+    return response.status(400).json({ error: error.message })
+  }
+
+  next(error)
 }
 app.use( errorHandler )
