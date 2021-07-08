@@ -53,27 +53,18 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons/', (request, response, next) => {
     const body = request.body
 
-    if( ( !body.name || !body.number ) ) {
-        response.status(400).send({ error: 'Name or number cannot be empty' })
+    const person = new Person({
+        name: body.name,
+        number: body.number,
+    })
 
-    } /* else if( persons.find( person => person.name === body.name) ){
-        response.status(400).json({
-            error: 'Name must be unique'
-        })
-        
-    }  */else{
-        const person = new Person({
-            name: body.name,
-            number: body.number,
-        })
-
-        person.save().then( savedPerson => {
+    person
+        .save()
+        .then( savedPerson => {
             console.log("person saved")
-            Person.find({}).then( persons => {
-                response.json(persons)
-            }) 
+            response.json( savedPerson.toJSON() )
         })
-    }
+        .catch( error => next(error) )
 })
 
 app.put( '/api/persons/:id', (request, response, next) => {
@@ -111,6 +102,10 @@ const errorHandler = (error, request, response, next) => {
 
     if( error.name === 'CastError'){
         return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    if( error.name === 'ValidationError' ){
+        return response.status(400).json({ error: error.message })
     }
     
     next(error)
