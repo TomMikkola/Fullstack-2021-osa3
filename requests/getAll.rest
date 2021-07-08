@@ -1,2 +1,3 @@
-GET https://blooming-taiga-62965.herokuapp.com/api/persons
+//GET https://blooming-taiga-62965.herokuapp.com/api/persons
+GET http://localhost:3001/api/persons
 Content-Type: application/json

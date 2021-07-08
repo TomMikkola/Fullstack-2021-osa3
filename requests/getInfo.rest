@@ -1,0 +1,2 @@
+// GET https://blooming-taiga-62965.herokuapp.com/api/info
+GET http://localhost:3001/api/info

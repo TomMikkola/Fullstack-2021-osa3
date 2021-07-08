@@ -1,7 +1,8 @@
-POST https://blooming-taiga-62965.herokuapp.com/api/persons
+//POST https://blooming-taiga-62965.herokuapp.com/api/persons
+POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-    "name": "Liisa Martinen",
-    "number": "040-243563"
+    "name": "Testi henkilö",
+    "number": "040-123456"
 }

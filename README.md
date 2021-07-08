@@ -1,2 +1,2 @@
-Link to app
-https://blooming-taiga-62965.herokuapp.com/api/persons
+Link to the app
+https://blooming-taiga-62965.herokuapp.com/

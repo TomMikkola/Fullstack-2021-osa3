@@ -1,1 +1,2 @@
-DELETE https://blooming-taiga-62965.herokuapp.com/api/persons/77
+//DELETE https://blooming-taiga-62965.herokuapp.com/api/persons/77
+DELETE http://localhost:3001/api/persons/60e6eaa67af80c4ab0bee60c
